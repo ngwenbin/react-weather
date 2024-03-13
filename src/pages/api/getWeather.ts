@@ -41,6 +41,8 @@ export type WeatherResponse = {
     temp_max: number;
     humidity: number;
   };
+  sys: { country: string };
+  name: string;
 };
 
 export default async function handler(
