@@ -1,4 +1,4 @@
-import { Button, Input } from "@/components/common";
+import { Button, Input, Spinner } from "@/components/common";
 import { FormEvent, useState } from "react";
 import { useWeather } from "./loader/weather";
 import { GetWeatherRequestBody } from "@/pages/api/getWeather";
@@ -62,8 +62,9 @@ export const HomePage = () => {
             className="min-w-0 truncate max-w-40"
           />
         </div>
-        <div className="basis-full sm:basis-auto m-1">
+        <div className="basis-full sm:basis-auto m-1 flex">
           <Button id="search" type="submit" disabled={isLoading}>
+            {isLoading && <Spinner className="!w-4 !h-4 mr-2" />}
             Search
           </Button>
           <Button id="clear" type="reset" disabled={isLoading}>
@@ -80,12 +81,20 @@ export const HomePage = () => {
         {firstWeatherResult && <WeatherDisplay data={firstWeatherResult} />}
       </div>
       <div className="flex flex-col my-8">
-        <h2 className=" border-b border-gray-300 mb-2">Search history</h2>
-        <WeatherSearchRecord
-          data={weatherHistory ?? []}
-          handleOnDelete={handleOnDelete}
-          handleOnSearch={handleOnSearch}
-        />
+        <h2 className=" border-b border-gray-300 mb-2 font-semibold">
+          Search history
+        </h2>
+        {isLoading ? (
+          <div className="flex justify-center my-4">
+            <Spinner />
+          </div>
+        ) : (
+          <WeatherSearchRecord
+            data={weatherHistory ?? []}
+            handleOnDelete={handleOnDelete}
+            handleOnSearch={handleOnSearch}
+          />
+        )}
       </div>
     </div>
   );

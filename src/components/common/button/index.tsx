@@ -18,7 +18,7 @@ export const Button = ({
       type={type}
       className={clsx(
         className,
-        "border px-3 py-1.5 rounded bg-black text-white text-sm h-min whitespace-nowrap",
+        "flex items-center border px-3 py-1.5 rounded bg-black text-white text-sm h-min whitespace-nowrap",
         "disabled:bg-gray-400 disabled:cursor-not-allowed"
       )}
     >
