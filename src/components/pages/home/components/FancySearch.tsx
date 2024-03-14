@@ -1,6 +1,5 @@
 import { Button, Input } from "@/components/common";
 import {
-  ArrowTopRightOnSquareIcon,
   ArrowUpRightIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";

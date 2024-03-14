@@ -1,4 +1,4 @@
-import { Button, Input, Spinner } from "@/components/common";
+import { Button, Spinner } from "@/components/common";
 import { FormEvent, useState } from "react";
 import { useWeather } from "./loader/weather";
 import { GetWeatherRequestBody } from "@/pages/api/getWeather";
