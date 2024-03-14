@@ -5,9 +5,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between ${inter.className} p-4`}
-    >
+    <main className={`min-h-screen ${inter.className} px-4`}>
       <HomePage />
     </main>
   );

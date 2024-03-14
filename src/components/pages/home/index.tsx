@@ -6,8 +6,12 @@ import { WeatherDisplay } from "./components/WeatherDisplay";
 import useLocalStorage from "@/components/hooks/useLocalStorage";
 import { WeatherData, parseWeatherData } from "./utils/parseWeatherData";
 import { WeatherSearchRecord } from "./components/WeatherSearchRecord";
+import { FancySearch } from "./components/FancySearch";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 export const HomePage = () => {
+  const [data, setData] = useState<WeatherData>();
+  const [showSearch, setShowSearch] = useState(false);
   const { getWeather, isLoading, errors } = useWeather();
   const { value: weatherHistory, setValue: setWeatherHistory } =
     useLocalStorage<WeatherData[]>("weather-history");
@@ -16,12 +20,14 @@ export const HomePage = () => {
     const weatherData = await getWeather(input);
     if (weatherData?.data) {
       const parsedWeatherData = parseWeatherData(weatherData.data);
+      setData(parsedWeatherData);
       setWeatherHistory((curr) => [parsedWeatherData, ...(curr ?? [])]);
     }
   };
 
   const handleOnSearch = (record: WeatherData) => {
     const { lat, lon } = record;
+    setShowSearch(false);
     handleGetWeather({ city: "", country: "", lat, lon });
   };
 
@@ -31,6 +37,7 @@ export const HomePage = () => {
 
   const handleOnSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setShowSearch(false);
     const data = new FormData(e.currentTarget);
     const formData = Object.fromEntries(
       data.entries()
@@ -38,63 +45,55 @@ export const HomePage = () => {
     handleGetWeather(formData);
   };
 
-  const firstWeatherResult = weatherHistory?.[0];
+  const handleOnSearchMenuClick = () => {
+    setShowSearch((curr) => !curr);
+  };
+
+  const handleHideSearchMenu = () => {
+    setShowSearch(false);
+  };
 
   return (
-    <div>
-      <h1 className="text-2xl py-8 font-bold">Weather App</h1>
-      <form className="flex flex-wrap" onSubmit={handleOnSubmit}>
-        <div className="flex flex-col sm:flex-row">
-          <Input
-            id="city"
-            name="city"
-            label="City:"
-            labelClassName="mr-2"
-            containerClassName="flex items-center grow justify-between m-1"
-            className="min-w-0 truncate max-w-40"
-          />
-          <Input
-            id="country"
-            name="country"
-            label="Country:"
-            labelClassName="mr-2"
-            containerClassName="flex items-center grow justify-between m-1"
-            className="min-w-0 truncate max-w-40"
-          />
-        </div>
-        <div className="basis-full sm:basis-auto m-1 flex">
-          <Button id="search" type="submit" disabled={isLoading}>
-            {isLoading && <Spinner className="!w-4 !h-4 mr-2" />}
-            Search
-          </Button>
-          <Button id="clear" type="reset" disabled={isLoading}>
-            Clear
-          </Button>
-        </div>
-      </form>
-      <div className="my-4">
-        {errors && (
-          <div className="bg-red-300 border border-red-600 w-full px-2 text-sm py-1 rounded">
-            {errors}
-          </div>
-        )}
-        {firstWeatherResult && <WeatherDisplay data={firstWeatherResult} />}
+    <div className="flex flex-col items-center bg-white">
+      <div className="text-lg font-medium py-8 flex w-full justify-between max-w-3xl text-black">
+        React Weather
+        <Button variant="secondary" onClick={handleOnSearchMenuClick}>
+          <MagnifyingGlassIcon className="w-6 h-6 text-[#6E6E73]" />
+        </Button>
       </div>
-      <div className="flex flex-col my-8">
-        <h2 className=" border-b border-gray-300 mb-2 font-semibold">
-          Search history
-        </h2>
-        {isLoading ? (
-          <div className="flex justify-center my-4">
-            <Spinner />
+
+      <div className="flex flex-col items-center w-full">
+        <FancySearch
+          show={showSearch}
+          onSubmit={handleOnSubmit}
+          onClose={handleHideSearchMenu}
+          history={weatherHistory ?? []}
+          onHistoryClick={handleOnSearch}
+        />
+        <div className="my-4 w-full max-w-3xl">
+          {errors && (
+            <div className="bg-red-200 border border-red-600 text-red-800 w-full px-2 text-sm py-1 rounded">
+              {errors}
+            </div>
+          )}
+          {data && <WeatherDisplay data={data} className="w-full" />}
+        </div>
+        <div className="flex flex-col my-8 max-w-3xl w-full">
+          <div className="mb-4 border-b border-gray-300 pb-1 font-medium text-black">
+            Search history
           </div>
-        ) : (
-          <WeatherSearchRecord
-            data={weatherHistory ?? []}
-            handleOnDelete={handleOnDelete}
-            handleOnSearch={handleOnSearch}
-          />
-        )}
+          {isLoading ? (
+            <div className="flex justify-center my-4">
+              <Spinner />
+            </div>
+          ) : (
+            <WeatherSearchRecord
+              data={weatherHistory ?? []}
+              handleOnDelete={handleOnDelete}
+              handleOnSearch={handleOnSearch}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

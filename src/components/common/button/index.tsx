@@ -1,15 +1,18 @@
 import clsx from "clsx";
-import { ButtonHTMLAttributes, InputHTMLAttributes } from "react";
+import { ButtonHTMLAttributes } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  variant?: "default" | "secondary";
 }
 
+// Controlled button
 export const Button = ({
   children,
   className,
   type = "button",
+  variant = "default",
   ...props
 }: ButtonProps) => {
   return (
@@ -18,7 +21,8 @@ export const Button = ({
       type={type}
       className={clsx(
         className,
-        "flex items-center border px-3 py-1.5 rounded bg-black text-white text-sm h-min whitespace-nowrap",
+        variant === "default" && "rounded bg-black text-white border",
+        "flex items-center  px-3 py-1.5  text-sm h-min whitespace-nowrap",
         "disabled:bg-gray-400 disabled:cursor-not-allowed"
       )}
     >
