@@ -1,24 +1,20 @@
-interface WeatherDisplayProps {
-  weatherMain: string;
-  weatherDescription: string;
-  city: string;
-  countryCode: string;
-  temperatureMax: number;
-  temperatuerMin: number;
-  humidity: number;
-  time: number;
+import { WeatherData } from "../utils/parseWeatherData";
+
+export interface WeatherDisplayProps {
+  data: WeatherData;
 }
 
-export const WeatherDisplay = ({
-  weatherMain,
-  weatherDescription,
-  city,
-  countryCode,
-  temperatuerMin,
-  temperatureMax,
-  humidity,
-  time,
-}: WeatherDisplayProps) => {
+export const WeatherDisplay = ({ data }: WeatherDisplayProps) => {
+  const {
+    weatherMain,
+    weatherDescription,
+    city,
+    countryCode,
+    temperatuerMin,
+    temperatureMax,
+    humidity,
+    time,
+  } = data;
   const date = new Date(time);
   return (
     <div className="flex flex-col">
@@ -34,12 +30,12 @@ export const WeatherDisplay = ({
         <tr>
           <th>Temperature: </th>
           <td>
-            {temperatuerMin} to {temperatureMax}
+            {temperatuerMin}&#8457; to {temperatureMax}&#8457;
           </td>
         </tr>
         <tr>
           <th>Humidity: </th>
-          <td>{humidity}</td>
+          <td>{humidity}%</td>
         </tr>
         <tr>
           <th>Time: </th>

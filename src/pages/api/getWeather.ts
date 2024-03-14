@@ -9,6 +9,8 @@ export type GetWeatherResponse = {
 export type GetWeatherRequestBody = {
   city: string;
   country: string;
+  lat?: number;
+  lon?: number;
 };
 
 const isValidBody = <T extends Record<string, unknown>>(
@@ -42,6 +44,7 @@ export type WeatherResponse = {
     humidity: number;
   };
   sys: { country: string };
+  id: number;
   name: string;
 };
 
@@ -54,19 +57,28 @@ export default async function handler(
     const isValidRequestBody = isValidBody<GetWeatherRequestBody>(body, [
       "city",
       "country",
+      "lat",
+      "lon",
     ]);
     if (!isValidRequestBody) throw Error("Invalid paramters");
-    const { city, country } = body;
-
+    const { city, country, lat: initialLat, lon: initialLon } = body;
     const openWeatherAccessKey = process.env.OPEN_WEATHER ?? "";
-    const geoEncodeEndpoint = `http://api.openweathermap.org/geo/1.0/direct?q=${city},$${country}&limit=1&appid=${openWeatherAccessKey}`;
+    let lat = initialLat;
+    let lon = initialLon;
 
-    const geoCodeResponse = await fetch(geoEncodeEndpoint);
-    const geoCodeData = (await geoCodeResponse.json()) as GeoCodeResponse;
-    if (geoCodeData.length === 0) {
-      throw Error("No such city / country");
+    // Skip lat lon api call if provided.
+    if (!lat && !lon) {
+      const geoEncodeEndpoint = `http://api.openweathermap.org/geo/1.0/direct?q=${city},$${country}&limit=1&appid=${openWeatherAccessKey}`;
+      const geoCodeResponse = await fetch(geoEncodeEndpoint);
+      const geoCodeData = (await geoCodeResponse.json()) as GeoCodeResponse;
+
+      if (geoCodeData.length === 0) {
+        throw Error("No such city / country");
+      }
+      const { lat: geoCodeDataLat, lon: geoCodeDataLon } = geoCodeData[0];
+      lat = geoCodeDataLat;
+      lon = geoCodeDataLon;
     }
-    const { lat, lon } = geoCodeData[0];
     const weatherEndpoint = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${openWeatherAccessKey}`;
     const weatherResponse = await fetch(weatherEndpoint);
     const weatherData = (await weatherResponse.json()) as WeatherResponse;
